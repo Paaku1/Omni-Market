@@ -1,0 +1,13 @@
+services:
+  # The fast memory for bidding
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  # The message broker (Post Office)
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"   # App communication
+      - "15672:15672" # Dashboard UI

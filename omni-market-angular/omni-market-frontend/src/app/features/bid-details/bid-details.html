@@ -1,0 +1,167 @@
+<div class="container mt-5 position-relative">
+  <!-- Floating Glassmorphism Outbid Alert Toast -->
+  <div *ngIf="outbidAlert" class="floating-outbid-toast shadow border border-danger rounded p-3 d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center">
+      <span class="bell-icon me-3">🚨</span>
+      <div>
+        <strong class="text-danger d-block">Outbid Warning!</strong>
+        <span class="text-white small">{{ outbidAlert.msg }}</span>
+      </div>
+    </div>
+    <div class="d-flex align-items-center ms-3">
+      <button class="btn btn-outline-danger btn-sm text-white border-secondary fw-bold" (click)="dismissAlert()">
+        Dismiss
+      </button>
+    </div>
+  </div>
+
+  <div class="row bg-dark text-white p-4 rounded shadow border border-secondary">
+    <!-- Left Column: Image & Details Description -->
+    <div class="col-md-6 d-flex flex-column align-items-center justify-content-start">
+      <div class="image-container bg-dark-lighter p-2 rounded w-100 mb-4 text-center">
+        <img [src]="imageUrl || 'https://via.placeholder.com/500x380'" class="img-fluid rounded shadow-sm" alt="Auction Item">
+      </div>
+      
+      <!-- Product Metadata Box -->
+      <div class="product-description-box w-100 p-4 rounded bg-dark-lighter border border-secondary shadow-sm">
+        <h4 class="text-gold mb-3 border-bottom border-secondary pb-2">Product Description</h4>
+        <p class="text-white-50 leading-relaxed">{{ description }}</p>
+        
+        <div class="mt-4 row g-2">
+          <div class="col-6">
+            <span class="d-block small text-muted">Starting Price</span>
+            <strong class="text-success h5">₹{{ startingPrice }}</strong>
+          </div>
+          <div class="col-6">
+            <span class="d-block small text-muted">Seller Reference</span>
+            <strong class="text-muted small">User-{{ sellerId ? sellerId.substring(0, 8) : 'System' }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Interactive Bidding Console -->
+    <div class="col-md-6 px-4">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+          <h2 class="text-gold mb-1">{{ productName }}</h2>
+          <p class="text-muted small mb-0">Item UUID: {{ itemId }}</p>
+        </div>
+        
+        <!-- Live Countdown Overlay Badge -->
+        <span class="badge px-3 py-2 rounded-pill border border-secondary backdrop-blur"
+              [class.bg-closed]="isClosed"
+              [class.bg-urgent]="!isClosed && isTimeUrgent()"
+              [class.bg-active]="!isClosed && !isTimeUrgent()">
+          <span class="pulse-dot me-2" [class.bg-danger]="isTimeUrgent()" [class.bg-success]="!isClosed && !isTimeUrgent()" *ngIf="!isClosed">●</span>
+          <span class="fw-bold tracking-wider uppercase small">{{ timeRemainingString }}</span>
+        </span>
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger py-2 mb-3">
+        <small>{{ errorMessage }}</small>
+      </div>
+
+      <!-- Pricing Console -->
+      <div class="card bg-dark border-secondary p-4 mb-4 position-relative overflow-hidden" [class.price-flash]="priceJustChanged">
+        <span class="text-muted text-uppercase small">Current High Bid</span>
+        <h1 class="text-success display-4 fw-bold mb-0">₹{{ currentPrice }}</h1>
+        <p class="text-muted mt-2 mb-0">High Bidder: <span class="fw-bold text-gold">{{ highBidder }}</span></p>
+      </div>
+
+      <!-- Celebrate Victory / State Closure Banner -->
+      @if (isClosed) {
+        @if (didCurrentUserWin()) {
+          <div class="card winner-card border-gold p-4 mb-4 text-center shadow-lg animate-winner">
+            <h3 class="text-warning mb-2 font-accent">🏆 Congratulations!</h3>
+            <p class="text-white mb-0">You won the auction! You purchased <strong>{{ productName }}</strong> for <span class="fw-bold text-success">₹{{ currentPrice }}</span>.</p>
+          </div>
+        } @else {
+          <div class="card bg-dark-lighter border-secondary p-4 mb-4 text-center shadow">
+            <h4 class="text-muted mb-2 font-accent">🔒 Auction Closed</h4>
+            <p class="text-white-50 mb-0">This auction has officially ended. Winner: <strong class="text-gold">{{ highBidder }}</strong> for <span class="fw-bold text-success">₹{{ currentPrice }}</span>.</p>
+          </div>
+        }
+      }
+
+      <!-- Interactive Placement Console (Only active if not closed and current user is NOT the seller) -->
+      <div class="bidding-input-console bg-dark-lighter p-4 rounded border border-secondary mb-4" *ngIf="!isClosed && !isCurrentUserSeller()">
+        <div class="form-group mb-3">
+          <label class="mb-2 text-muted fw-semibold">Your Maximum Bid</label>
+          <div class="input-group">
+            <span class="input-group-text bg-secondary border-secondary text-white fw-bold">₹</span>
+            <input type="number" [(ngModel)]="bidAmount" class="form-control bg-dark text-white border-secondary fw-bold text-success h4 py-3 mb-0" placeholder="Enter amount">
+          </div>
+        </div>
+
+        <!-- Smart Increment Shortcut Buttons -->
+        <div class="mb-4">
+          <span class="d-block small text-muted mb-2 fw-semibold">Quick Bid Shortcuts:</span>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-warning flex-grow-1 py-2 fw-bold rounded transition-all" (click)="addIncrement(50)">+₹50</button>
+            <button class="btn btn-outline-warning flex-grow-1 py-2 fw-bold rounded transition-all" (click)="addIncrement(100)">+₹100</button>
+            <button class="btn btn-outline-warning flex-grow-1 py-2 fw-bold rounded transition-all" (click)="addIncrement(500)">+₹500</button>
+            <button class="btn btn-outline-warning flex-grow-1 py-2 fw-bold rounded transition-all" (click)="addIncrement(1000)">+₹1,000</button>
+          </div>
+        </div>
+
+        <button class="btn btn-gold w-100 fw-bold py-3 shadow transition-all" (click)="placeBid()" [disabled]="!bidAmount">
+          PLACE REAL-TIME BID
+        </button>
+      </div>
+
+      <!-- Escrow Self-Bidding Restriction Box (Only active if not closed and current user IS the seller) -->
+      <div class="card border-warning bg-dark p-4 mb-4 text-center shadow-sm" *ngIf="!isClosed && isCurrentUserSeller()" style="background: rgba(30, 25, 20, 0.45) !important; border: 1px solid rgba(251, 191, 36, 0.25) !important;">
+        <h4 class="text-warning mb-2 font-accent" style="text-shadow: 0 0 10px rgba(251, 191, 36, 0.2);">🔒 Escrow Protection Policy</h4>
+        <p class="text-white-50 small mb-0 leading-relaxed">You are the registered seller of this asset. Placing bids on your own live items is disabled to guarantee fair competition and comply with platform shill bidding rules.</p>
+      </div>
+
+      <!-- Live Bid History Table -->
+      <div class="mt-4">
+        <h4 class="text-gold mb-3 d-flex align-items-center">
+          <span class="badge bg-danger me-2 pulse-live">● LIVE</span>
+          Bid History Table
+        </h4>
+        <div class="table-responsive rounded border border-secondary shadow-sm" style="background: rgba(30, 30, 30, 0.45); backdrop-filter: blur(10px);">
+          <table class="table table-dark table-hover mb-0 text-center align-middle">
+            <thead class="bg-dark-lighter text-gold border-secondary">
+              <tr>
+                <th scope="col" class="py-3 text-uppercase small">Rank</th>
+                <th scope="col" class="py-3 text-uppercase small">Bidder Name</th>
+                <th scope="col" class="py-3 text-uppercase small">Amount</th>
+                <th scope="col" class="py-3 text-uppercase small">Time Placed</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (bid of bidHistory; track $index) {
+                <tr class="border-secondary">
+                  <td class="py-3">
+                    <span class="badge" [class.bg-warning]="$index === 0" [class.text-dark]="$index === 0" [class.bg-secondary]="$index > 0">
+                      #{{ $index + 1 }}
+                    </span>
+                  </td>
+                  <td class="py-3 text-muted">
+                    {{ bid.bidderName || 'User-' + (bid.bidderId ? bid.bidderId.toString().substring(0, 8) : 'Unknown') }}
+                  </td>
+                  <td class="py-3 fw-bold text-success">
+                    ₹{{ bid.amount }}
+                  </td>
+                  <td class="py-3 text-muted small">
+                    {{ bid.createdAt | date:'medium' }}
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" class="py-4 text-muted text-center italic">
+                    No bids have been placed on this item yet. Be the first to place a bid!
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

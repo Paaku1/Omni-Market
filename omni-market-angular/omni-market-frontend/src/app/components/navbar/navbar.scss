@@ -1,0 +1,97 @@
+.text-gold {
+  color: #ffca2c;
+  text-shadow: 0 0 10px rgba(255, 202, 44, 0.25);
+}
+
+.bg-black {
+  background-color: #0b0c10 !important;
+}
+
+.text-muted-light {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.text-muted-dark {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+.hover-white {
+  transition: color 0.2s ease;
+  &:hover {
+    color: #fff !important;
+  }
+}
+
+// Role toggle button glassmorphic colors
+.role-toggle-btn {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(5px);
+  border-width: 1px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  
+  &.bg-bidder {
+    border-color: rgba(25, 135, 84, 0.35) !important;
+    background: rgba(25, 135, 84, 0.08) !important;
+    &:hover {
+      background: rgba(25, 135, 84, 0.15) !important;
+      border-color: rgba(25, 135, 84, 0.6) !important;
+      box-shadow: 0 0 15px rgba(25, 135, 84, 0.25);
+    }
+  }
+  
+  &.bg-seller {
+    border-color: rgba(13, 110, 253, 0.35) !important;
+    background: rgba(13, 110, 253, 0.08) !important;
+    &:hover {
+      background: rgba(13, 110, 253, 0.15) !important;
+      border-color: rgba(13, 110, 253, 0.6) !important;
+      box-shadow: 0 0 15px rgba(13, 110, 253, 0.25);
+    }
+  }
+}
+
+// Pulse dots
+.pulse-dot-nav {
+  display: inline-block;
+  font-size: 0.8rem;
+  
+  &.bg-success {
+    color: #2ec4b6;
+    text-shadow: 0 0 8px #2ec4b6;
+  }
+  
+  &.bg-info {
+    color: #0dcaf0;
+    text-shadow: 0 0 8px #0dcaf0;
+  }
+}
+
+.role-switch-icon {
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+}
+
+.role-toggle-btn:hover .role-switch-icon {
+  transform: rotate(180deg);
+}
+
+.font-xs {
+  font-size: 0.72rem !important;
+}
+
+.font-sm {
+  font-size: 0.85rem !important;
+}
+
+.tracking-widest {
+  letter-spacing: 2px;
+}
+
+.tracking-wider {
+  letter-spacing: 1px;
+}
+
+.transition-all {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}

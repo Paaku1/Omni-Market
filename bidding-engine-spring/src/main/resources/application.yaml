@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: bidding-engine-spring
+
+  # R2DBC configuration for Supabase PostgreSQL
+  r2dbc:
+    url: r2dbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:6543/postgres?sslMode=require&preparedStatementCacheQueries=0
+    username: postgres.jktxgbkbyvyqhkyvfdal
+    password: ${SUPABASE_DB_PASS:omnimarket@2026}
+
+  # Redis configuration for fast bidding cache
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  # RabbitMQ configuration for message brokerage
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+# Supabase Auth URL & Anon Key for token verification
+supabase:
+  url: ${SUPABASE_URL:https://jktxgbkbyvyqhkyvfdal.supabase.co}
+  anon-key: ${SUPABASE_KEY:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprdHhnYmtieXZ5cWhreXZmZGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2Mzc0OTQsImV4cCI6MjA5MTIxMzQ5NH0.ItUx8dOH1UWPh-A2ZbynFJhp12Lu4XIwUB3XoI6GfTU}

@@ -1,0 +1,539 @@
+<div class="om-dashboard">
+
+  <!-- ═══════════════ FLOATING TOASTS ═══════════════ -->
+  <div *ngIf="outbidToast" class="om-toast om-toast--warning">
+    <div class="om-toast__icon">🔔</div>
+    <div class="om-toast__body">
+      <span class="om-toast__title">Outbid Alert</span>
+      <span class="om-toast__msg">{{ outbidToast.msg }}</span>
+    </div>
+    <div class="om-toast__actions">
+      <button class="om-btn om-btn--warning om-btn--sm" [routerLink]="['/bid', outbidToast.auctionId]" (click)="dismissToast()">
+        Bid Back
+      </button>
+      <button class="om-toast__close" (click)="dismissToast()">✕</button>
+    </div>
+  </div>
+
+  <div *ngIf="creationSuccess" class="om-toast om-toast--success">
+    <div class="om-toast__icon">✨</div>
+    <div class="om-toast__body">
+      <span class="om-toast__title">Listing Live!</span>
+      <span class="om-toast__msg">Your auction is now live and accepting bids.</span>
+    </div>
+    <button class="om-toast__close" (click)="creationSuccess = false">✕</button>
+  </div>
+
+  <div *ngIf="productCreationSuccess" class="om-toast om-toast--success">
+    <div class="om-toast__icon">📦</div>
+    <div class="om-toast__body">
+      <span class="om-toast__title">Product Registered!</span>
+      <span class="om-toast__msg">Your product has been added to your inventory.</span>
+    </div>
+    <button class="om-toast__close" (click)="productCreationSuccess = false">✕</button>
+  </div>
+
+  <div *ngIf="listSuccess" class="om-toast om-toast--success">
+    <div class="om-toast__icon">🚀</div>
+    <div class="om-toast__body">
+      <span class="om-toast__title">Auction Launched!</span>
+      <span class="om-toast__msg">Your product is now listed live in the bidding arena.</span>
+    </div>
+    <button class="om-toast__close" (click)="listSuccess = false">✕</button>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       BIDDER VIEW
+  ═══════════════════════════════════════════════════════ -->
+  <ng-container *ngIf="authService.getCurrentRole() === 'bidder'">
+
+    <!-- Hero Header -->
+    <div class="om-hero">
+      <div class="om-hero__left">
+        <div class="om-live-chip">
+          <span class="om-live-chip__dot"></span>
+          LIVE ENGINE
+        </div>
+        <h1 class="om-hero__title">Live Auction<br><span class="om-gradient-text">Arena</span></h1>
+        <p class="om-hero__subtitle">Compete in real-time global auctions with millisecond bidding updates.</p>
+      </div>
+      <div class="om-hero__stats">
+        <div class="om-hero__stat">
+          <span class="om-hero__stat-num">{{ items.length }}</span>
+          <span class="om-hero__stat-label">Live Auctions</span>
+        </div>
+        <div class="om-hero__divider"></div>
+        <div class="om-hero__stat">
+          <span class="om-hero__stat-num">{{ getActiveCount() }}</span>
+          <span class="om-hero__stat-label">Active Bids</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Auction Grid -->
+    <div class="om-grid">
+      @for (item of items; track item.auctionId) {
+        <div class="om-auction-card" [class.om-auction-card--closed]="item.isClosed">
+
+          <!-- Image -->
+          <div class="om-card-image">
+            <img [src]="item.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60'" [alt]="item.productName">
+            <!-- Timer badge -->
+            <div class="om-timer-badge"
+                 [class.om-timer-badge--live]="!item.isClosed && !isTimeUrgent(item.auctionId)"
+                 [class.om-timer-badge--urgent]="!item.isClosed && isTimeUrgent(item.auctionId)"
+                 [class.om-timer-badge--closed]="item.isClosed">
+              <span class="om-timer-badge__dot" *ngIf="!item.isClosed"></span>
+              {{ item.isClosed ? 'Ended' : (timers[item.auctionId] || '—') }}
+            </div>
+            <!-- Closed overlay -->
+            <div class="om-card-closed-overlay" *ngIf="item.isClosed">
+              <span>AUCTION ENDED</span>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="om-card-body">
+            <h3 class="om-card-title">{{ item.productName }}</h3>
+            <p class="om-card-desc">{{ item.description || 'Premium item listed on Omni-Market Auction Platform.' }}</p>
+
+            <div class="om-card-pricing">
+              <div class="om-card-price-block">
+                <span class="om-card-price-label">Current Price</span>
+                <span class="om-card-price-value">₹{{ (item.currentBid || item.startingPrice) | number }}</span>
+              </div>
+              <div class="om-card-price-sep"></div>
+              <div class="om-card-price-block om-card-price-block--right">
+                <span class="om-card-price-label">High Bidder</span>
+                <span class="om-card-bidder" [class.om-card-bidder--active]="item.currentBid">
+                  {{ item.bidderName || 'No bids yet' }}
+                </span>
+              </div>
+            </div>
+
+            <a [routerLink]="['/bid', item.auctionId]"
+               class="om-bid-btn"
+               [class.om-bid-btn--disabled]="item.isClosed">
+              <span *ngIf="!item.isClosed">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Place Real-Time Bid
+              </span>
+              <span *ngIf="item.isClosed">Auction Closed</span>
+            </a>
+          </div>
+
+        </div>
+      } @empty {
+        <div class="om-empty-state">
+          <div class="om-empty-state__icon">🏛️</div>
+          <h3 class="om-empty-state__title">No Active Auctions</h3>
+          <p class="om-empty-state__msg">The arena is quiet right now. New auctions drop soon — check back shortly!</p>
+        </div>
+      }
+    </div>
+
+  </ng-container>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       SELLER VIEW
+  ═══════════════════════════════════════════════════════ -->
+  <ng-container *ngIf="authService.getCurrentRole() === 'seller'">
+
+    <!-- Seller Hero -->
+    <div class="om-seller-hero">
+      <div class="om-seller-hero__left">
+        <div class="om-live-chip om-live-chip--cyan">
+          <span class="om-live-chip__dot om-live-chip__dot--cyan"></span>
+          SELLER PORTAL
+        </div>
+        <h1 class="om-hero__title">Command<br><span class="om-gradient-text om-gradient-text--cyan">Center</span></h1>
+        <p class="om-hero__subtitle">Track live bid streams, monitor asset velocity, and launch real-time auctions.</p>
+      </div>
+      <div class="om-seller-hero__actions">
+        <button class="om-launch-btn om-launch-btn--ghost" (click)="showProductForm = !showProductForm; showCreationForm = false">
+          <span class="om-launch-btn__icon">{{ showProductForm ? '✕' : '+' }}</span>
+          {{ showProductForm ? 'Cancel' : 'Add Product to Inventory' }}
+        </button>
+        <button class="om-launch-btn" (click)="showCreationForm = !showCreationForm; showProductForm = false">
+          <span class="om-launch-btn__icon">{{ showCreationForm ? '✕' : '+' }}</span>
+          {{ showCreationForm ? 'Cancel' : 'Launch Live Auction' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Analytics Row -->
+    <div class="om-analytics-row">
+
+      <div class="om-stat-card om-stat-card--blue">
+        <div class="om-stat-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div class="om-stat-card__body">
+          <span class="om-stat-card__label">Active Listings</span>
+          <span class="om-stat-card__value">{{ activeListingsCount }}</span>
+          <span class="om-stat-card__sub">Currently receiving bids</span>
+        </div>
+        <div class="om-stat-card__glow"></div>
+      </div>
+
+      <div class="om-stat-card om-stat-card--green">
+        <div class="om-stat-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <div class="om-stat-card__body">
+          <span class="om-stat-card__label">Gross Store Value</span>
+          <span class="om-stat-card__value">₹{{ totalEarnings | number }}</span>
+          <span class="om-stat-card__sub">Across all active listings</span>
+        </div>
+        <div class="om-stat-card__glow"></div>
+      </div>
+
+      <div class="om-stat-card om-stat-card--amber">
+        <div class="om-stat-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <div class="om-stat-card__body">
+          <span class="om-stat-card__label">Platform Commission</span>
+          <span class="om-stat-card__value">₹{{ totalEarnings * 0.02 | number:'1.0-0' }}</span>
+          <span class="om-stat-card__sub">Est. 2% escrow fee</span>
+        </div>
+        <div class="om-stat-card__glow"></div>
+      </div>
+
+      <div class="om-stat-card om-stat-card--purple">
+        <div class="om-stat-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="om-stat-card__body">
+          <span class="om-stat-card__label">Total Listings</span>
+          <span class="om-stat-card__value">{{ sellerItems.length }}</span>
+          <span class="om-stat-card__sub">All time auctions created</span>
+        </div>
+        <div class="om-stat-card__glow"></div>
+      </div>
+
+    </div>
+
+    <!-- ─── Creation Form Panel ─── -->
+    <div class="om-creation-panel" [class.om-creation-panel--open]="showCreationForm">
+      <div class="om-creation-panel__inner" *ngIf="showCreationForm">
+        <div class="om-creation-panel__header">
+          <h2 class="om-creation-panel__title">
+            <span class="om-creation-panel__title-icon">📦</span>
+            Launch New Auction
+          </h2>
+          <p class="om-creation-panel__sub">Fill in the details below to list your asset on the live bidding arena.</p>
+        </div>
+
+        <div class="om-form-grid">
+          <div class="om-field">
+            <label class="om-label">Product Name</label>
+            <input type="text" [(ngModel)]="newAuctionName" class="om-input" placeholder="e.g. Vintage Gold Watch 1974">
+          </div>
+
+          <div class="om-field">
+            <label class="om-label">Starting Price (₹)</label>
+            <input type="number" [(ngModel)]="newAuctionStartPrice" class="om-input om-input--price" placeholder="1000">
+          </div>
+
+          <div class="om-field">
+            <label class="om-label">Auction Duration</label>
+            <select [(ngModel)]="newAuctionDuration" class="om-select">
+              <option [value]="5">5 Minutes (Test)</option>
+              <option [value]="30">30 Minutes</option>
+              <option [value]="60">1 Hour</option>
+              <option [value]="1440">24 Hours</option>
+            </select>
+          </div>
+
+          <div class="om-field om-field--upload">
+            <label class="om-label">Product Image</label>
+            <div class="om-upload-zone" (click)="fileInput.click()">
+              <input type="file" #fileInput class="om-upload-zone__input" accept="image/*" (change)="onFileSelected($event)">
+
+              <div class="om-upload-zone__idle" *ngIf="!selectedFileName && !uploadedImageUrl">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Click to upload image</span>
+              </div>
+
+              <div class="om-upload-zone__uploading" *ngIf="selectedFileName && !uploadedImageUrl && isUploadingImage">
+                <div class="om-spinner"></div>
+                <span>Uploading {{ selectedFileName }}…</span>
+              </div>
+
+              <div class="om-upload-zone__success" *ngIf="uploadedImageUrl">
+                <img [src]="uploadedImageUrl" class="om-upload-zone__preview">
+                <div>
+                  <span class="om-upload-zone__success-name">✓ {{ selectedFileName || 'Image uploaded' }}</span>
+                  <span class="om-upload-zone__change">Click to change</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="om-field om-field--full">
+            <label class="om-label">Description</label>
+            <textarea [(ngModel)]="newAuctionDesc" class="om-textarea" rows="3"
+              placeholder="Describe the condition, certificates, and unique aspects of your item…"></textarea>
+          </div>
+        </div>
+
+        <div class="om-creation-panel__footer">
+          <button class="om-btn om-btn--ghost" (click)="showCreationForm = false">Cancel</button>
+          <button class="om-btn om-btn--launch"
+                  (click)="onCreateAuction()"
+                  [disabled]="isSubmitting || !newAuctionName || newAuctionStartPrice <= 0">
+            <div class="om-spinner om-spinner--sm" *ngIf="isSubmitting"></div>
+            <svg *ngIf="!isSubmitting" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            {{ isSubmitting ? 'Listing…' : 'List Asset Live' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Product Registration Panel ─── -->
+    <div class="om-creation-panel" [class.om-creation-panel--open]="showProductForm">
+      <div class="om-creation-panel__inner" *ngIf="showProductForm">
+        <div class="om-creation-panel__header">
+          <h2 class="om-creation-panel__title om-creation-panel__title--cyan">
+            <span class="om-creation-panel__title-icon">📁</span>
+            Add Product to Inventory
+          </h2>
+          <p class="om-creation-panel__sub">Add a product into your private inventory list. You can launch it live later.</p>
+        </div>
+
+        <div class="om-form-grid">
+          <div class="om-field">
+            <label class="om-label">Product Name</label>
+            <input type="text" [(ngModel)]="newAuctionName" class="om-input" placeholder="e.g. Rolex Submariner 2022">
+          </div>
+
+          <div class="om-field">
+            <label class="om-label">Starting Price (₹)</label>
+            <input type="number" [(ngModel)]="newAuctionStartPrice" class="om-input om-input--price" placeholder="5000">
+          </div>
+
+          <div class="om-field om-field--upload">
+            <label class="om-label">Product Image</label>
+            <div class="om-upload-zone" (click)="fileInput2.click()">
+              <input type="file" #fileInput2 class="om-upload-zone__input" accept="image/*" (change)="onFileSelected($event)">
+
+              <div class="om-upload-zone__idle" *ngIf="!selectedFileName && !uploadedImageUrl">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Click to upload image</span>
+              </div>
+
+              <div class="om-upload-zone__uploading" *ngIf="selectedFileName && !uploadedImageUrl && isUploadingImage">
+                <div class="om-spinner"></div>
+                <span>Uploading {{ selectedFileName }}…</span>
+              </div>
+
+              <div class="om-upload-zone__success" *ngIf="uploadedImageUrl">
+                <img [src]="uploadedImageUrl" class="om-upload-zone__preview">
+                <div>
+                  <span class="om-upload-zone__success-name">✓ {{ selectedFileName || 'Image uploaded' }}</span>
+                  <span class="om-upload-zone__change">Click to change</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="om-field om-field--full">
+            <label class="om-label">Description</label>
+            <textarea [(ngModel)]="newAuctionDesc" class="om-textarea" rows="3"
+              placeholder="Describe the condition, box and papers, reference numbers, etc…"></textarea>
+          </div>
+        </div>
+
+        <div class="om-creation-panel__footer">
+          <button class="om-btn om-btn--ghost" (click)="showProductForm = false">Cancel</button>
+          <button class="om-btn om-btn--launch om-btn--launch-cyan"
+                  (click)="onCreateProduct()"
+                  [disabled]="isSubmittingProduct || !newAuctionName || newAuctionStartPrice <= 0">
+            <div class="om-spinner om-spinner--sm" *ngIf="isSubmittingProduct"></div>
+            <svg *ngIf="!isSubmittingProduct" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 4v16m8-8H4"/></svg>
+            {{ isSubmittingProduct ? 'Saving…' : 'Add to Inventory' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Product Inventory Section ─── -->
+    <div class="om-listings-section om-inventory-section mb-5">
+      <div class="om-listings-header">
+        <div class="om-listings-header__left">
+          <span class="om-pulse-dot om-pulse-dot--cyan"></span>
+          <h2 class="om-listings-title text-cyan-glow">Your Product Inventory</h2>
+          <span class="om-listings-badge om-listings-badge--cyan">{{ myProducts.length }}</span>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="om-empty-state om-empty-state--table" *ngIf="myProducts.length === 0">
+        <div class="om-empty-state__icon">📁</div>
+        <h3 class="om-empty-state__title">Inventory is empty</h3>
+        <p class="om-empty-state__msg">Click "Add Product to Inventory" above to register your items in the system.</p>
+      </div>
+
+      <!-- Inventory Grid -->
+      <div class="om-inventory-grid" *ngIf="myProducts.length > 0">
+        @for (prod of myProducts; track prod.id) {
+          <div class="om-inventory-card" [class.om-inventory-card--active]="isProductActive(prod.id)">
+            <div class="om-inventory-card__image">
+              <img [src]="prod.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&auto=format&fit=crop&q=60'" [alt]="prod.name">
+              <span class="om-inventory-status" [class.om-inventory-status--active]="isProductActive(prod.id)" [class.om-inventory-status--unlisted]="!isProductActive(prod.id)">
+                {{ isProductActive(prod.id) ? '⚡ LIVE' : '📁 UNLISTED' }}
+              </span>
+            </div>
+            
+            <div class="om-inventory-card__body">
+              <h3 class="om-inventory-card__title">{{ prod.name }}</h3>
+              <p class="om-inventory-card__desc">{{ prod.description || 'No description provided.' }}</p>
+              
+              <div class="om-inventory-card__footer">
+                <div class="om-inventory-card__price">
+                  <span class="om-inventory-card__price-label">Start Price</span>
+                  <span class="om-inventory-card__price-val">₹{{ prod.startingPrice | number }}</span>
+                </div>
+                
+                <div class="om-inventory-card__actions">
+                  <button *ngIf="!isProductActive(prod.id)" class="om-btn-inventory om-btn-inventory--list" (click)="openListModal(prod)">
+                    🚀 List live
+                  </button>
+                  <a *ngIf="isProductActive(prod.id)" [routerLink]="['/bid', getActiveAuctionId(prod.id)]" class="om-btn-inventory om-btn-inventory--monitor">
+                    ⚡ Monitor
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ─── Listings Table ─── -->
+    <div class="om-listings-section">
+      <div class="om-listings-header">
+        <div class="om-listings-header__left">
+          <span class="om-pulse-dot"></span>
+          <h2 class="om-listings-title">Your Listings</h2>
+          <span class="om-listings-badge">{{ sellerItems.length }}</span>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="om-empty-state om-empty-state--table" *ngIf="sellerItems.length === 0">
+        <div class="om-empty-state__icon">📭</div>
+        <h3 class="om-empty-state__title">No listings yet</h3>
+        <p class="om-empty-state__msg">Click "Launch New Auction" above to register your first asset on the live arena.</p>
+      </div>
+
+      <!-- Listings Cards (Mobile-First Modern Design) -->
+      <div class="om-listings-grid" *ngIf="sellerItems.length > 0">
+        @for (item of sellerItems; track item.auctionId) {
+          <div class="om-listing-row" [class.om-listing-row--closed]="item.isClosed">
+
+            <div class="om-listing-row__image">
+              <img [src]="item.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&auto=format&fit=crop&q=60'" [alt]="item.productName">
+            </div>
+
+            <div class="om-listing-row__info">
+              <span class="om-listing-row__name">{{ item.productName }}</span>
+              <span class="om-listing-row__id">ID: {{ item.auctionId | slice:0:12 }}…</span>
+            </div>
+
+            <div class="om-listing-row__metric">
+              <span class="om-listing-row__metric-label">Start Price</span>
+              <span class="om-listing-row__metric-val">₹{{ item.startingPrice | number }}</span>
+            </div>
+
+            <div class="om-listing-row__metric">
+              <span class="om-listing-row__metric-label">High Bid</span>
+              <span class="om-listing-row__metric-val om-listing-row__metric-val--green">
+                {{ item.currentBid ? ('₹' + (item.currentBid | number)) : '—' }}
+              </span>
+            </div>
+
+            <div class="om-listing-row__metric">
+              <span class="om-listing-row__metric-label">Time Left</span>
+              <span class="om-listing-row__metric-val"
+                    [class.om-listing-row__metric-val--urgent]="isTimeUrgent(item.auctionId) && !item.isClosed">
+                {{ timers[item.auctionId] || '—' }}
+              </span>
+            </div>
+
+            <div class="om-listing-row__status">
+              <span class="om-status-pill" [class.om-status-pill--active]="!item.isClosed" [class.om-status-pill--closed]="item.isClosed">
+                <span class="om-status-pill__dot"></span>
+                {{ item.isClosed ? 'Closed' : 'Active' }}
+              </span>
+            </div>
+
+            <div class="om-listing-row__actions">
+              <a [routerLink]="['/bid', item.auctionId]" class="om-action-btn om-action-btn--monitor" title="Monitor Bids">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                Monitor
+              </a>
+              <button *ngIf="!item.isClosed" class="om-action-btn om-action-btn--stop" (click)="stopBidding(item.auctionId)" title="Stop Bidding">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                Stop
+              </button>
+              <button *ngIf="item.isClosed" class="om-action-btn om-action-btn--resume" (click)="resumeBidding(item.auctionId)" title="Resume Bidding">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Resume
+              </button>
+            </div>
+
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ─── List Modal Overlay ─── -->
+    <div class="om-modal-overlay" *ngIf="showListModal">
+      <div class="om-modal">
+        <div class="om-modal__header">
+          <h3 class="om-modal__title">🚀 List Product in Live Auction</h3>
+          <button class="om-modal__close" (click)="closeListModal()">✕</button>
+        </div>
+        
+        <div class="om-modal__body" *ngIf="activeListProduct">
+          <div class="om-modal-product-summary">
+            <img [src]="activeListProduct.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100&auto=format&fit=crop&q=60'" class="om-modal-product-img">
+            <div>
+              <span class="om-modal-product-name">{{ activeListProduct.name }}</span>
+              <span class="om-modal-product-price">Default Start Price: ₹{{ activeListProduct.startingPrice | number }}</span>
+            </div>
+          </div>
+          
+          <div class="om-field mt-3">
+            <label class="om-label">Override Starting Price (₹) <span class="text-muted font-xs">(Optional, leave 0 to use default)</span></label>
+            <input type="number" [(ngModel)]="listAuctionPrice" class="om-input om-input--price">
+          </div>
+          
+          <div class="om-field mt-3">
+            <label class="om-label">Auction Duration</label>
+            <select [(ngModel)]="listAuctionDuration" class="om-select">
+              <option [value]="5">5 Minutes (Test)</option>
+              <option [value]="30">30 Minutes</option>
+              <option [value]="60">1 Hour</option>
+              <option [value]="1440">24 Hours</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="om-modal__footer">
+          <button class="om-btn om-btn--ghost" (click)="closeListModal()">Cancel</button>
+          <button class="om-btn om-btn--launch" (click)="onListProductAuction()" [disabled]="isSubmittingList">
+            <div class="om-spinner om-spinner--sm" *ngIf="isSubmittingList"></div>
+            {{ isSubmittingList ? 'Launching…' : 'Launch Auction Live' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
+</div>

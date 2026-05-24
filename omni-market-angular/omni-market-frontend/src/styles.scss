@@ -1,0 +1,33 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* ── Global Base Styles ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --om-bg-base: #080c14;
+  --om-font: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --om-cyan: #38bdf8;
+  --om-gold: #f5c542;
+  --om-green: #34d399;
+}
+
+html, body {
+  font-family: var(--om-font);
+  background: var(--om-bg-base);
+  color: #f0f4ff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0c1018; }
+::-webkit-scrollbar-thumb { background: #1e2a3a; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #2a3a4e; }
+
+/* Selection */
+::selection { background: rgba(56, 189, 248, 0.25); color: #f0f4ff; }

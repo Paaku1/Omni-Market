@@ -1,0 +1,61 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-black sticky-top border-bottom border-secondary py-3">
+  <div class="container-fluid px-4">
+    <!-- Brand logo with glowing text -->
+    <a class="navbar-brand text-gold fw-bold tracking-wider fs-4" routerLink="/">
+      OMNI MARKET <span class="text-white fw-light font-xs ms-1">ARENA</span>
+    </a>
+
+    <!-- Main Navigation Right -->
+    <div class="navbar-nav ms-auto align-items-center">
+      
+      <!-- Guest Links -->
+      <ng-container *ngIf="!(authService.user$ | async)">
+        <a class="nav-link text-white-50 px-3 hover-white" routerLink="/login">🛒 Bidder Login</a>
+        <a class="nav-link text-white-50 px-3 hover-white" routerLink="/seller/login">💼 Seller Login</a>
+        <a class="nav-link btn btn-outline-warning text-gold fw-bold px-4 py-2 ms-2 shadow-sm rounded-pill" routerLink="/signup">Sign Up</a>
+      </ng-container>
+
+      <!-- Logged-in Links & Controls -->
+      <ng-container *ngIf="authService.user$ | async as user">
+        
+        <!-- Premium Active Role Badge (Read-Only based on registration) -->
+        <div class="me-3">
+          <div class="badge rounded-pill px-3 py-2 border d-flex align-items-center"
+               [style.border-color]="authService.getCurrentRole() === 'bidder' ? 'rgba(46,196,182,0.35)' : 'rgba(13,110,253,0.35)'"
+               [style.background]="authService.getCurrentRole() === 'bidder' ? 'rgba(46,196,182,0.08)' : 'rgba(13,110,253,0.08)'">
+            <span class="pulse-dot-nav me-2" [class.bg-success]="authService.getCurrentRole() === 'bidder'" [class.bg-info]="authService.getCurrentRole() === 'seller'">●</span>
+            <span class="fw-bold text-uppercase font-xs tracking-widest text-white">
+              {{ authService.getCurrentRole() === 'bidder' ? 'Bidder Account' : 'Seller Account' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Dynamic Context Links -->
+        <a class="nav-link px-3" 
+           [class.text-warning]="authService.getCurrentRole() === 'bidder'" 
+           [class.text-info]="authService.getCurrentRole() === 'seller'" 
+           routerLink="/dashboard">
+          <span *ngIf="authService.getCurrentRole() === 'bidder'">🛒 Active Dashboard</span>
+          <span *ngIf="authService.getCurrentRole() === 'seller'">💼 Seller Console</span>
+        </a>
+
+        <!-- Divider -->
+        <span class="text-muted-dark px-2">|</span>
+
+        <!-- User Profile Statement & Logout -->
+        <a class="d-flex align-items-center text-decoration-none me-3" routerLink="/profile" title="View Profile">
+          <img [src]="user.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/bottts/svg?seed=Felix'" 
+               class="rounded-circle border border-gold me-2" 
+               style="width: 32px; height: 32px; object-fit: cover;">
+          <span class="text-muted-light small hover-white fw-bold">
+            {{ user.user_metadata?.full_name || user.email }}
+          </span>
+        </a>
+        <button class="btn btn-outline-secondary btn-sm px-3 py-2 rounded-pill fw-semibold" (click)="onLogout()">
+          Logout
+        </button>
+        
+      </ng-container>
+    </div>
+  </div>
+</nav>

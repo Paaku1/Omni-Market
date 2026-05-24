@@ -1,0 +1,266 @@
+<div class="pf-page">
+
+  <!-- ── Toast: Success ── -->
+  <div *ngIf="saveSuccess" class="pf-toast pf-toast--success">
+    <span class="pf-toast__icon">🏆</span>
+    <div class="pf-toast__body">
+      <strong>Profile Updated!</strong>
+      <span>Your identity is now active across the OmniMarket network.</span>
+    </div>
+    <button class="pf-toast__close" (click)="saveSuccess = false">✕</button>
+  </div>
+
+  <!-- ── Toast: Error ── -->
+  <div *ngIf="errorMessage" class="pf-toast pf-toast--error">
+    <span class="pf-toast__icon">⚠️</span>
+    <div class="pf-toast__body">
+      <strong>Save Failed</strong>
+      <span>{{ errorMessage }}</span>
+    </div>
+    <button class="pf-toast__close" (click)="errorMessage = ''">✕</button>
+  </div>
+
+  <!-- ── Page Wrapper ── -->
+  <div class="pf-layout">
+
+    <!-- ════════════════ LEFT SIDEBAR ════════════════ -->
+    <aside class="pf-sidebar">
+
+      <!-- Role Badge -->
+      <div class="pf-role-badge" [class.pf-role-badge--seller]="isSeller" [class.pf-role-badge--bidder]="isBidder">
+        <span class="pf-role-badge__icon">{{ roleIcon }}</span>
+        <span class="pf-role-badge__label">{{ roleLabel }}</span>
+      </div>
+
+      <!-- Avatar -->
+      <div class="pf-avatar-ring" [class.pf-avatar-ring--seller]="isSeller">
+        <img [src]="selectedAvatar" alt="User Avatar" class="pf-avatar-img">
+        <div class="pf-avatar-online"></div>
+      </div>
+
+      <!-- Name & Email -->
+      <div class="pf-sidebar__identity">
+        <h2 class="pf-sidebar__name">
+          {{ profileForm.value.fullName || 'Your Name' }}
+        </h2>
+        <span class="pf-sidebar__email">{{ userEmail }}</span>
+        <span class="pf-sidebar__joined" *ngIf="joinDate">Member since {{ joinDate }}</span>
+      </div>
+
+      <!-- Divider -->
+      <div class="pf-sidebar__divider"></div>
+
+      <!-- ── SELLER STATS ── -->
+      <ng-container *ngIf="isSeller">
+        <h3 class="pf-sidebar__section-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Seller Performance
+        </h3>
+        <div class="pf-stat-list">
+          <div class="pf-stat-item pf-stat-item--cyan">
+            <span class="pf-stat-item__num">{{ activeListings }}</span>
+            <span class="pf-stat-item__label">Active Listings</span>
+          </div>
+          <div class="pf-stat-item pf-stat-item--green">
+            <span class="pf-stat-item__num">₹{{ totalRevenue | number:'1.0-0' }}</span>
+            <span class="pf-stat-item__label">Total Store Value</span>
+          </div>
+          <div class="pf-stat-item pf-stat-item--amber">
+            <span class="pf-stat-item__num">{{ closedListings }}</span>
+            <span class="pf-stat-item__label">Closed Auctions</span>
+          </div>
+          <div class="pf-stat-item pf-stat-item--purple">
+            <span class="pf-stat-item__num">{{ sellerItems.length }}</span>
+            <span class="pf-stat-item__label">All Time Listed</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ── BIDDER STATS ── -->
+      <ng-container *ngIf="isBidder">
+        <h3 class="pf-sidebar__section-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Bidder Activity
+        </h3>
+        <div class="pf-stat-list">
+          <div class="pf-stat-item pf-stat-item--gold">
+            <span class="pf-stat-item__num">{{ activeBidCount }}</span>
+            <span class="pf-stat-item__label">Auctions Active</span>
+          </div>
+          <div class="pf-stat-item pf-stat-item--cyan">
+            <span class="pf-stat-item__num">{{ auctionsParticipated }}</span>
+            <span class="pf-stat-item__label">Auctions Live Now</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Back Button -->
+      <button class="pf-back-btn" (click)="goBack()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Arena
+      </button>
+
+    </aside>
+
+    <!-- ════════════════ MAIN CONTENT ════════════════ -->
+    <main class="pf-main">
+
+      <!-- Page Title -->
+      <div class="pf-main__header">
+        <div>
+          <h1 class="pf-main__title">
+            <span class="pf-gradient-text" [class.pf-gradient-text--cyan]="isSeller">
+              {{ isSeller ? 'Seller' : 'Bidder' }} Profile
+            </span>
+          </h1>
+          <p class="pf-main__subtitle">
+            Customize your public identity displayed across all
+            {{ isSeller ? 'live auction listings and bid streams.' : 'auctions, bid history, and leaderboards.' }}
+          </p>
+        </div>
+        <div class="pf-main__role-chip" [class.pf-main__role-chip--seller]="isSeller">
+          <span>{{ roleIcon }}</span> {{ roleLabel }} Account
+        </div>
+      </div>
+
+      <!-- ── SECTION 1: Avatar Selection ── -->
+      <section class="pf-section">
+        <div class="pf-section__header">
+          <h2 class="pf-section__title">Profile Avatar</h2>
+          <span class="pf-section__sub">Choose a preset or upload your own image</span>
+        </div>
+
+        <div class="pf-avatar-editor">
+
+          <!-- Live Preview -->
+          <div class="pf-avatar-preview-wrap">
+            <div class="pf-avatar-preview" [class.pf-avatar-preview--seller]="isSeller">
+              <img [src]="selectedAvatar" alt="Preview">
+            </div>
+            <div class="pf-avatar-upload-btn" (click)="fileInput.click()">
+              <input type="file" #fileInput class="pf-avatar-upload-btn__input" accept="image/*" (change)="onFileSelected($event)">
+              <div *ngIf="!isUploadingAvatar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Upload Photo
+              </div>
+              <div class="pf-spinner pf-spinner--sm" *ngIf="isUploadingAvatar"></div>
+            </div>
+            <span *ngIf="selectedFileName && !isUploadingAvatar" class="pf-avatar-preview__filename">
+              ✓ {{ selectedFileName }}
+            </span>
+          </div>
+
+          <!-- Preset Grid -->
+          <div class="pf-presets">
+            <p class="pf-presets__label">Quick Presets</p>
+            <div class="pf-presets__grid">
+              <div *ngFor="let preset of avatarPresets"
+                   class="pf-preset-item"
+                   [class.pf-preset-item--active]="selectedAvatar === preset"
+                   (click)="selectPresetAvatar(preset)">
+                <img [src]="preset" alt="avatar preset">
+                <div class="pf-preset-item__check" *ngIf="selectedAvatar === preset">✓</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ── SECTION 2: Display Name ── -->
+      <section class="pf-section">
+        <div class="pf-section__header">
+          <h2 class="pf-section__title">Display Name</h2>
+          <span class="pf-section__sub">
+            {{ isSeller
+              ? 'Shown on all your auction listing pages and bid streams'
+              : 'Shown in bid history, live bid trackers, and leaderboards' }}
+          </span>
+        </div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="onSaveProfile()" class="pf-name-form">
+          <div class="pf-field-group">
+            <label class="pf-label">
+              {{ isSeller ? 'Seller Display Name' : 'Bidder Handle / Name' }}
+            </label>
+            <div class="pf-input-wrap">
+              <span class="pf-input-prefix">{{ isSeller ? '🏪' : '⚡' }}</span>
+              <input
+                type="text"
+                formControlName="fullName"
+                class="pf-input"
+                [placeholder]="isSeller ? 'e.g. GoldMine Auctions' : 'e.g. BiddingKnight'"
+              >
+            </div>
+
+            <div class="pf-field-errors" *ngIf="profileForm.controls['fullName'].touched && profileForm.controls['fullName'].invalid">
+              <span *ngIf="profileForm.controls['fullName'].errors?.['required']">Name is required.</span>
+              <span *ngIf="profileForm.controls['fullName'].errors?.['minlength']">Must be at least 2 characters.</span>
+            </div>
+          </div>
+
+          <!-- Role Callout -->
+          <div class="pf-role-callout" [class.pf-role-callout--seller]="isSeller">
+            <span class="pf-role-callout__icon">{{ isSeller ? '📦' : '⚡' }}</span>
+            <div *ngIf="isSeller">
+              <strong>Seller Identity</strong>
+              <p>Your display name appears on every auction listing you create, in bid streams, and on your seller page visible to all bidders.</p>
+            </div>
+            <div *ngIf="isBidder">
+              <strong>Bidder Identity</strong>
+              <p>Your display name is shown next to your bids in real-time bid streams, auction history, and is visible to sellers monitoring their listings.</p>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="pf-form-actions">
+            <button type="button" class="pf-btn pf-btn--ghost" (click)="goBack()">Cancel</button>
+            <button
+              type="submit"
+              class="pf-btn pf-btn--save"
+              [class.pf-btn--seller]="isSeller"
+              [disabled]="profileForm.invalid || isSaving || isUploadingAvatar">
+              <div class="pf-spinner pf-spinner--sm" *ngIf="isSaving"></div>
+              <svg *ngIf="!isSaving" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              {{ isSaving ? 'Saving…' : 'Save Profile' }}
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ── SECTION 3: Role-specific quick links ── -->
+      <section class="pf-section pf-section--links">
+        <div class="pf-quick-links">
+
+          <ng-container *ngIf="isSeller">
+            <a class="pf-quick-link" [routerLink]="['/dashboard']">
+              <div class="pf-quick-link__icon pf-quick-link__icon--cyan">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              </div>
+              <div>
+                <strong>My Auction Listings</strong>
+                <span>Manage and monitor all your active auctions</span>
+              </div>
+              <svg class="pf-quick-link__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          </ng-container>
+
+          <ng-container *ngIf="isBidder">
+            <a class="pf-quick-link" [routerLink]="['/dashboard']">
+              <div class="pf-quick-link__icon pf-quick-link__icon--gold">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              </div>
+              <div>
+                <strong>Live Auction Arena</strong>
+                <span>Browse and bid on active auctions</span>
+              </div>
+              <svg class="pf-quick-link__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          </ng-container>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>

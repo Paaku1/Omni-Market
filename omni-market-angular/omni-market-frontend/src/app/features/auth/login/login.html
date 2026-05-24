@@ -1,0 +1,81 @@
+<div class="login-wrapper min-vh-100 d-flex align-items-center justify-content-center bg-black position-relative overflow-hidden">
+  
+  <!-- Glowing Background Orbs -->
+  <div class="glow-orb orb-gold"></div>
+  <div class="glow-orb orb-blue"></div>
+
+  <div class="glass-card shadow-lg p-5 rounded-4 border border-secondary border-opacity-10 position-relative z-3">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      
+      <!-- Brand Header -->
+      <div class="text-center mb-4">
+        <h1 class="text-gold fw-bold tracking-wider mb-1 fs-3">OMNI-MARKET ARENA</h1>
+        <p class="text-muted small">Enter the real-time global bidding portal</p>
+      </div>
+
+      <div class="row g-4 align-items-center">
+        <!-- Credentials Form Column -->
+        <div class="col-md-7 border-end border-secondary border-opacity-20 pe-md-4">
+          
+          <!-- Email Input -->
+          <div class="form-group mb-3">
+            <label class="form-label text-muted-light font-xs tracking-wider mb-2">EMAIL ADDRESS</label>
+            <div class="input-group-premium rounded">
+              <span class="input-icon">✉</span>
+              <input type="email" formControlName="email" class="form-control-premium" placeholder="name@domain.com">
+            </div>
+          </div>
+
+          <!-- Password Input -->
+          <div class="form-group mb-4">
+            <label class="form-label text-muted-light font-xs tracking-wider mb-2">PORTAL PASSWORD</label>
+            <div class="input-group-premium rounded">
+              <span class="input-icon">🔑</span>
+              <input type="password" formControlName="password" class="form-control-premium" placeholder="••••••••">
+            </div>
+          </div>
+
+          <!-- Error Alert -->
+          <div *ngIf="errorMessage" class="alert alert-danger py-2 mb-3 font-xs">
+            ⚠️ {{ errorMessage }}
+          </div>
+
+          <!-- Submit Button -->
+          <button class="btn btn-gold w-100 py-3 fw-bold rounded-pill shadow tracking-wider transition-all" 
+                  type="submit" 
+                  [disabled]="loginForm.invalid || isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isLoading ? 'CONNECTING...' : 'ENTER ARENA' }}
+          </button>
+
+          <!-- Signup Nav Link -->
+          <p class="text-center mt-3 mb-0 small text-white-50">
+            New user? <a routerLink="/signup" class="text-gold fw-bold hover-underline">Register Profile</a>
+          </p>
+
+          <!-- Seller Portal Access -->
+          <div class="text-center mt-3 pt-2 border-top border-secondary border-opacity-10">
+            <a routerLink="/seller/login" class="text-info-glowing font-xs fw-bold tracking-wider text-decoration-none transition-all">
+              💼 ACCESS SELLER PORTAL &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- OAuth / Identity Column -->
+        <div class="col-md-5 ps-md-4 text-center mt-4 mt-md-0">
+          <p class="text-muted-light small mb-3 tracking-wider font-xs">FEDERATED SIGN IN</p>
+          
+          <button type="button" class="btn btn-google-premium rounded-pill d-flex align-items-center justify-content-center w-100 py-3 shadow transition-all" (click)="onGoogleLogin()">
+            <img src="Google-Icon.png" alt="Google" class="me-2" style="width: 22px; height: 22px;">
+            <span class="fw-semibold text-white small">Google Account</span>
+          </button>
+
+          <p class="text-muted font-xs mt-3 leading-sm px-2">
+            Secure, encrypted OAuth identity connection via Supabase Auth.
+          </p>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>

@@ -1,0 +1,799 @@
+// ═══════════════════════════════════════════════════════════════════
+//  OmniMarket – Role-Aware Profile Page Styles
+// ═══════════════════════════════════════════════════════════════════
+
+// ── Design tokens ────────────────────────────────────────────────────
+$bg:        #080c14;
+$bg-card:   #0e1420;
+$bg-raised: #131a28;
+$border:        rgba(255, 255, 255, 0.07);
+$border-active: rgba(99, 179, 237, 0.25);
+
+$gold:      #f5c542;
+$gold-glow: rgba(245, 197, 66, 0.2);
+$cyan:      #38bdf8;
+$cyan-glow: rgba(56, 189, 248, 0.15);
+$green:     #34d399;
+$amber:     #fbbf24;
+$purple:    #a78bfa;
+$red:       #f87171;
+
+$text-pri:  #f0f4ff;
+$text-sec:  #8895b3;
+$text-dim:  #4e5a72;
+
+$r-sm:  8px;
+$r-md:  14px;
+$r-lg:  20px;
+$r-xl:  28px;
+
+// ── Page base ────────────────────────────────────────────────────────
+.pf-page {
+  min-height: 100vh;
+  background: $bg;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: $text-pri;
+  padding: 32px 40px 80px;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 50% 35% at 15% 15%, rgba(56, 189, 248, 0.04) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 30% at 85% 80%, rgba(245, 197, 66, 0.04) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  > * { position: relative; z-index: 1; }
+}
+
+// ── Toasts ────────────────────────────────────────────────────────────
+.pf-toast {
+  position: fixed;
+  top: 88px;
+  right: 24px;
+  width: 360px;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: $r-md;
+  background: rgba(12, 18, 30, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid $border;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: pf-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  &--success { border-left: 3px solid $green; }
+  &--error   { border-left: 3px solid $red; }
+
+  &__icon { font-size: 1.4rem; flex-shrink: 0; }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong { font-size: 0.8rem; color: $text-pri; }
+    span   { font-size: 0.78rem; color: $text-sec; }
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    color: $text-dim;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s;
+
+    &:hover { color: $text-pri; }
+  }
+}
+
+@keyframes pf-slide-in {
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0);   opacity: 1; }
+}
+
+// ── Layout ────────────────────────────────────────────────────────────
+.pf-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────
+.pf-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $r-xl;
+  padding: 32px 24px;
+  position: sticky;
+  top: 24px;
+  height: fit-content;
+}
+
+// Role Badge
+.pf-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+
+  &__icon { font-size: 1rem; }
+
+  &--bidder {
+    background: $gold-glow;
+    border: 1px solid rgba(245, 197, 66, 0.3);
+    color: $gold;
+  }
+
+  &--seller {
+    background: $cyan-glow;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: $cyan;
+  }
+}
+
+// Avatar ring
+.pf-avatar-ring {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, $gold, $amber);
+  box-shadow: 0 0 0 4px rgba(245, 197, 66, 0.1), 0 8px 32px rgba(0,0,0,0.4);
+
+  &--seller {
+    background: linear-gradient(135deg, $cyan, #818cf8);
+    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1), 0 8px 32px rgba(0,0,0,0.4);
+  }
+}
+
+.pf-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: $bg-card;
+}
+
+.pf-avatar-online {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: $green;
+  border: 2px solid $bg-card;
+  animation: pf-blink 2s infinite;
+}
+
+@keyframes pf-blink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px $green; }
+  50%       { opacity: 0.5; box-shadow: none; }
+}
+
+// Identity
+.pf-sidebar__identity {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pf-sidebar__name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+  color: $text-pri;
+}
+
+.pf-sidebar__email {
+  font-size: 0.75rem;
+  color: $text-sec;
+}
+
+.pf-sidebar__joined {
+  font-size: 0.68rem;
+  color: $text-dim;
+}
+
+.pf-sidebar__divider {
+  width: 100%;
+  height: 1px;
+  background: $border;
+}
+
+.pf-sidebar__section-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: $text-dim;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+}
+
+// Stat list in sidebar
+.pf-stat-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pf-stat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: $r-sm;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid $border;
+  transition: all 0.2s ease;
+
+  &:hover { background: rgba(255,255,255,0.04); }
+
+  &__num {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  &__label {
+    font-size: 0.7rem;
+    color: $text-sec;
+    text-align: right;
+  }
+
+  &--cyan  { .pf-stat-item__num { color: $cyan; } }
+  &--green { .pf-stat-item__num { color: $green; } }
+  &--amber { .pf-stat-item__num { color: $amber; } }
+  &--purple{ .pf-stat-item__num { color: $purple; } }
+  &--gold  { .pf-stat-item__num { color: $gold; } }
+}
+
+// Back button
+.pf-back-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid $border;
+  color: $text-sec;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 4px;
+
+  &:hover {
+    background: rgba(255,255,255,0.07);
+    color: $text-pri;
+  }
+}
+
+// ── Main Content ──────────────────────────────────────────────────────
+.pf-main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pf-main__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid $border;
+}
+
+.pf-main__title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0 0 8px;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.pf-main__subtitle {
+  font-size: 0.88rem;
+  color: $text-sec;
+  margin: 0;
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+.pf-gradient-text {
+  background: linear-gradient(135deg, $gold 0%, $amber 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  &--cyan {
+    background: linear-gradient(135deg, $cyan 0%, #818cf8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+.pf-main__role-chip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: $gold-glow;
+  border: 1px solid rgba(245, 197, 66, 0.3);
+  color: $gold;
+
+  &--seller {
+    background: $cyan-glow;
+    border-color: rgba(56, 189, 248, 0.3);
+    color: $cyan;
+  }
+}
+
+// ── Sections ──────────────────────────────────────────────────────────
+.pf-section {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $r-xl;
+  padding: 32px;
+
+  &--links {
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+
+  &__header {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  &__title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+    color: $text-pri;
+  }
+
+  &__sub {
+    font-size: 0.78rem;
+    color: $text-dim;
+  }
+}
+
+// ── Avatar Editor ─────────────────────────────────────────────────────
+.pf-avatar-editor {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.pf-avatar-preview-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.pf-avatar-preview {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, $gold, $amber);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  &--seller {
+    background: linear-gradient(135deg, $cyan, #818cf8);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: $bg-card;
+  }
+}
+
+.pf-avatar-upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 16px;
+  border-radius: $r-sm;
+  background: rgba(255,255,255,0.04);
+  border: 1px dashed rgba(255,255,255,0.12);
+  color: $text-sec;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: rgba(56, 189, 248, 0.4);
+    color: $cyan;
+    background: rgba(56, 189, 248, 0.04);
+  }
+
+  &__input { display: none; }
+}
+
+.pf-avatar-preview__filename {
+  font-size: 0.65rem;
+  color: $green;
+  text-align: center;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Presets
+.pf-presets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pf-presets__label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: $text-dim;
+  margin: 0;
+}
+
+.pf-presets__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.pf-preset-item {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: $r-sm;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background: rgba(255,255,255,0.03);
+  transition: all 0.2s ease;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    padding: 4px;
+  }
+
+  &:hover {
+    border-color: rgba(245, 197, 66, 0.4);
+    transform: scale(1.06);
+  }
+
+  &--active {
+    border-color: $gold;
+    box-shadow: 0 0 0 2px rgba(245, 197, 66, 0.2);
+  }
+
+  &__check {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: $gold;
+    color: #000;
+    font-size: 0.6rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// ── Name Form ─────────────────────────────────────────────────────────
+.pf-name-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pf-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pf-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: $text-sec;
+}
+
+.pf-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pf-input-prefix {
+  position: absolute;
+  left: 16px;
+  font-size: 1.1rem;
+  z-index: 1;
+}
+
+.pf-input {
+  width: 100%;
+  padding: 14px 16px 14px 48px;
+  border-radius: $r-sm;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.09);
+  color: $text-pri;
+  font-size: 1rem;
+  font-weight: 600;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+
+  &::placeholder { color: $text-dim; font-weight: 400; }
+
+  &:focus {
+    border-color: rgba(245, 197, 66, 0.5);
+    background: rgba(245, 197, 66, 0.03);
+    box-shadow: 0 0 0 3px rgba(245, 197, 66, 0.08);
+  }
+}
+
+.pf-field-errors {
+  font-size: 0.75rem;
+  color: $red;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+// Role Callout Box
+.pf-role-callout {
+  display: flex;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: $r-md;
+  background: $gold-glow;
+  border: 1px solid rgba(245, 197, 66, 0.2);
+
+  &--seller {
+    background: $cyan-glow;
+    border-color: rgba(56, 189, 248, 0.2);
+  }
+
+  &__icon { font-size: 1.5rem; flex-shrink: 0; }
+
+  div {
+    strong {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: $text-pri;
+      margin-bottom: 4px;
+    }
+
+    p {
+      font-size: 0.78rem;
+      color: $text-sec;
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+}
+
+// Form Actions
+.pf-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────
+.pf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  &--ghost {
+    background: rgba(255,255,255,0.04);
+    color: $text-sec;
+    border: 1px solid $border;
+
+    &:hover { background: rgba(255,255,255,0.08); color: $text-pri; }
+  }
+
+  &--save {
+    background: linear-gradient(135deg, $gold 0%, $amber 100%);
+    color: #060a14;
+    box-shadow: 0 4px 16px $gold-glow;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px $gold-glow;
+      filter: brightness(1.06);
+    }
+  }
+
+  &--seller {
+    background: linear-gradient(135deg, $cyan 0%, #818cf8 100%);
+    box-shadow: 0 4px 16px rgba(56, 189, 248, 0.2);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 8px 28px rgba(56, 189, 248, 0.35);
+    }
+  }
+}
+
+// ── Quick Links ───────────────────────────────────────────────────────
+.pf-quick-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pf-quick-link {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 24px;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $r-lg;
+  text-decoration: none;
+  color: $text-pri;
+  transition: all 0.25s ease;
+
+  &:hover {
+    border-color: $border-active;
+    transform: translateX(4px);
+    background: $bg-raised;
+    color: $text-pri;
+
+    .pf-quick-link__arrow { transform: translateX(4px); color: $cyan; }
+  }
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: $r-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &--gold {
+      background: $gold-glow;
+      color: $gold;
+      border: 1px solid rgba(245, 197, 66, 0.2);
+    }
+
+    &--cyan {
+      background: $cyan-glow;
+      color: $cyan;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+  }
+
+  div {
+    flex: 1;
+
+    strong {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    span {
+      font-size: 0.75rem;
+      color: $text-sec;
+    }
+  }
+
+  &__arrow {
+    color: $text-dim;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+}
+
+// ── Spinner ───────────────────────────────────────────────────────────
+.pf-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: pf-spin 0.7s linear infinite;
+
+  &--sm { width: 14px; height: 14px; }
+}
+
+@keyframes pf-spin { to { transform: rotate(360deg); } }
+
+// ── Responsive ───────────────────────────────────────────────────────
+@media (max-width: 1024px) {
+  .pf-layout { grid-template-columns: 260px 1fr; gap: 24px; }
+  .pf-avatar-editor { grid-template-columns: 160px 1fr; gap: 24px; }
+  .pf-presets__grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .pf-page { padding: 24px 20px 60px; }
+  .pf-layout { grid-template-columns: 1fr; }
+  .pf-sidebar { position: static; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+  .pf-sidebar__identity { text-align: center; }
+  .pf-stat-list { flex-direction: row; flex-wrap: wrap; }
+  .pf-stat-item { flex: 1; min-width: 140px; }
+  .pf-avatar-editor { grid-template-columns: 1fr; }
+  .pf-avatar-preview-wrap { flex-direction: row; align-items: center; }
+  .pf-main__header { flex-direction: column; }
+}

@@ -1,0 +1,195 @@
+.text-gold {
+  color: #ffca2c;
+  text-shadow: 0 0 10px rgba(255, 202, 44, 0.25);
+}
+
+.bg-dark-lighter {
+  background-color: rgba(25, 25, 25, 0.75);
+  backdrop-filter: blur(5px);
+}
+
+.price-flash {
+  animation: flash-green 1s ease-out;
+}
+
+@keyframes flash-green {
+  0% {
+    background-color: rgba(40, 167, 69, 0.25) !important;
+    border-color: #28a745 !important;
+    box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+  }
+  100% {
+    background-color: rgba(25, 25, 25, 0.75) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: none;
+  }
+}
+
+// Live Pulse Badge
+.pulse-live {
+  animation: live-pulse-glow 1.5s infinite alternate;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+@keyframes live-pulse-glow {
+  0% { box-shadow: 0 0 5px rgba(220, 53, 69, 0.5); }
+  100% { box-shadow: 0 0 15px rgba(220, 53, 69, 0.9); }
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+// Glassmorphism Timer overlays
+.backdrop-blur {
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bg-active {
+  background: rgba(25, 135, 84, 0.65) !important;
+  color: #fff;
+  border: 1px solid rgba(25, 135, 84, 0.3);
+}
+
+.bg-urgent {
+  background: rgba(255, 193, 7, 0.65) !important;
+  color: #111;
+  border: 1px solid rgba(255, 193, 7, 0.5);
+  animation: urgent-blink 1s infinite alternate;
+}
+
+.bg-closed {
+  background: rgba(108, 117, 125, 0.65) !important;
+  color: #fff;
+  border: 1px solid rgba(108, 117, 125, 0.2);
+}
+
+@keyframes urgent-blink {
+  0% { box-shadow: 0 0 5px rgba(255, 193, 7, 0.3); }
+  100% { box-shadow: 0 0 15px rgba(255, 193, 7, 0.7); }
+}
+
+.pulse-dot {
+  display: inline-block;
+  font-size: 0.7rem;
+  
+  &.bg-success {
+    color: #2ec4b6;
+    text-shadow: 0 0 8px #2ec4b6;
+  }
+  
+  &.bg-danger {
+    color: #e63946;
+    text-shadow: 0 0 8px #e63946;
+    animation: blinker 0.6s linear infinite;
+  }
+}
+
+@keyframes blinker {
+  50% { opacity: 0; }
+}
+
+// Quick Bid Increments
+.btn-outline-warning {
+  border-color: rgba(255, 202, 44, 0.4);
+  color: #ffca2c;
+  background: transparent;
+  
+  &:hover {
+    background: #ffca2c;
+    color: #000;
+    box-shadow: 0 4px 12px rgba(255, 202, 44, 0.25);
+  }
+}
+
+// Grand Winner Card Celebration
+.winner-card {
+  background: linear-gradient(135deg, rgba(30, 25, 10, 0.9) 0%, rgba(15, 15, 15, 0.95) 100%) !important;
+  border: 2px solid #ffca2c !important;
+  box-shadow: 0 15px 35px rgba(255, 202, 44, 0.15) !important;
+}
+
+.animate-winner {
+  animation: winner-glow 2s infinite alternate;
+}
+
+@keyframes winner-glow {
+  0% { box-shadow: 0 0 10px rgba(255, 202, 44, 0.15), inset 0 0 5px rgba(255, 202, 44, 0.1); }
+  100% { box-shadow: 0 0 25px rgba(255, 202, 44, 0.45), inset 0 0 15px rgba(255, 202, 44, 0.2); }
+}
+
+// Floating Outbid Alert Toast on details page
+.floating-outbid-toast {
+  position: fixed;
+  top: 90px;
+  right: 24px;
+  width: 380px;
+  z-index: 1050;
+  background: rgba(30, 10, 10, 0.85);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(220, 53, 69, 0.4) !important;
+  border-left: 5px solid #dc3545 !important;
+  color: #fff;
+  animation: slide-in-toast 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes slide-in-toast {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.bell-icon {
+  font-size: 1.5rem;
+  animation: wobble 1s infinite alternate;
+}
+
+@keyframes wobble {
+  0% { transform: rotate(-10deg); }
+  100% { transform: rotate(10deg); }
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #ffca2c 0%, #d4af37 100%);
+  color: #000;
+  border: none;
+  
+  &:hover {
+    background: linear-gradient(135deg, #ffd03b 0%, #e2be4b 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 202, 44, 0.3);
+  }
+}
+
+.btn-outline-danger {
+  border-color: rgba(220, 53, 69, 0.5);
+  color: #dc3545;
+  
+  &:hover {
+    background-color: #dc3545;
+    color: #fff;
+  }
+}
+
+.product-description-box {
+  background-color: rgba(20, 20, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.leading-relaxed {
+  line-height: 1.6;
+}
+
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}

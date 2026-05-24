@@ -1,0 +1,135 @@
+<div class="signup-wrapper min-vh-100 d-flex align-items-center justify-content-center bg-black position-relative overflow-hidden">
+  
+  <!-- Glowing Background Orbs -->
+  <div class="glow-orb orb-gold"></div>
+  <div class="glow-orb orb-blue"></div>
+
+  <div class="glass-card shadow-lg p-5 rounded-4 border border-secondary border-opacity-10 position-relative z-3">
+    <form [formGroup]="signupForm" (ngSubmit)="onSignUp()">
+      
+      <!-- Brand Header -->
+      <div class="text-center mb-4">
+        <h1 class="text-gold fw-bold tracking-wider mb-1 fs-3">CREATE OMNI ACCOUNT</h1>
+        <p class="text-muted small">Register your permanent profile parameters inside the Arena</p>
+      </div>
+
+      <div class="row g-4 align-items-stretch">
+        
+        <!-- Registration Form Column -->
+        <div class="col-md-7 border-end border-secondary border-opacity-20 pe-md-4">
+          
+          <!-- Full Name -->
+          <div class="form-group mb-3">
+            <label class="form-label text-muted-light font-xs tracking-wider mb-2">FULL NAME</label>
+            <div class="input-group-premium rounded" [class.border-danger-glow]="f['fullName'].invalid && f['fullName'].touched">
+              <span class="input-icon">👤</span>
+              <input type="text" formControlName="fullName" class="form-control-premium" placeholder="John Doe">
+            </div>
+            <div class="error-text" *ngIf="f['fullName'].touched && f['fullName'].errors">
+              <small *ngIf="f['fullName'].errors?.['required']">Full Name is required.</small>
+              <small *ngIf="f['fullName'].errors?.['minlength']">Minimum 2 characters required.</small>
+              <small *ngIf="f['fullName'].errors?.['pattern']">Only letters and spaces allowed.</small>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group mb-3">
+            <label class="form-label text-muted-light font-xs tracking-wider mb-2">EMAIL ADDRESS</label>
+            <div class="input-group-premium rounded" [class.border-danger-glow]="f['email'].invalid && f['email'].touched">
+              <span class="input-icon">✉</span>
+              <input type="email" formControlName="email" class="form-control-premium" placeholder="name@domain.com">
+            </div>
+            <div class="error-text" *ngIf="f['email'].touched && f['email'].errors">
+              <small *ngIf="f['email'].errors?.['required']">Email is required.</small>
+              <small *ngIf="f['email'].errors?.['email']">Enter a valid email structure.</small>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group mb-4">
+            <label class="form-label text-muted-light font-xs tracking-wider mb-2">PORTAL PASSWORD</label>
+            <div class="input-group-premium rounded" [class.border-danger-glow]="f['password'].invalid && f['password'].touched">
+              <span class="input-icon">🔑</span>
+              <input type="password" formControlName="password" class="form-control-premium" placeholder="••••••••">
+            </div>
+            <div class="error-text" *ngIf="f['password'].touched && f['password'].errors">
+              <small *ngIf="f['password'].errors?.['required']">Password is required.</small>
+              <small *ngIf="f['password'].errors?.['minlength']">Must be at least 8 characters.</small>
+              <small *ngIf="f['password'].errors?.['pattern']">Needs 1 uppercase, 1 number, and 1 symbol (!@#$%).</small>
+            </div>
+          </div>
+
+          <!-- Error Alert -->
+          <div *ngIf="errorMessage" class="alert alert-danger py-2 mb-3 font-xs">
+            ⚠️ {{ errorMessage }}
+          </div>
+
+          <!-- Submit Button -->
+          <button class="btn btn-gold w-100 py-3 fw-bold rounded-pill shadow tracking-wider transition-all" 
+                  type="submit" 
+                  [disabled]="signupForm.invalid || isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isLoading ? 'REGISTERING...' : 'CREATE ACCOUNT' }}
+          </button>
+
+          <!-- Login Nav Link -->
+          <p class="text-center mt-3 mb-0 small text-white-50">
+            Already registered? <a routerLink="/login" class="text-gold fw-bold hover-underline">Login Port</a>
+          </p>
+        </div>
+
+        <!-- Role Selector & OAuth Column -->
+        <div class="col-md-5 ps-md-4 d-flex flex-column justify-content-between">
+          
+          <!-- Premium Account Type Selector -->
+          <div class="form-group mb-4">
+            <label class="d-block mb-3 text-muted-light small fw-bold tracking-wider font-xs text-center text-md-start">SELECT PORTAL ROLE</label>
+            <div class="d-flex flex-column gap-3">
+              
+              <!-- Bidder Option Card -->
+              <label class="p-3 rounded border text-center text-md-start cursor-pointer transition-all role-card d-flex align-items-center"
+                     [style.border-color]="f['role'].value === 'bidder' ? '#2ec4b6' : 'rgba(255,255,255,0.08)'"
+                     [style.background]="f['role'].value === 'bidder' ? 'rgba(46,196,182,0.1)' : 'rgba(255,255,255,0.02)'">
+                <input type="radio" formControlName="role" value="bidder" class="d-none">
+                <span class="fs-2 me-3">🛒</span>
+                <div>
+                  <strong class="text-white font-sm uppercase tracking-wider mb-1 d-block">Bidder</strong>
+                  <span class="text-muted font-xs d-block" style="font-size:0.68rem; line-height:1.2;">Place bids & buy live assets</span>
+                </div>
+              </label>
+
+              <!-- Seller Option Card -->
+              <label class="p-3 rounded border text-center text-md-start cursor-pointer transition-all role-card d-flex align-items-center"
+                     [style.border-color]="f['role'].value === 'seller' ? '#0dcaf0' : 'rgba(255,255,255,0.08)'"
+                     [style.background]="f['role'].value === 'seller' ? 'rgba(13,202,240,0.1)' : 'rgba(255,255,255,0.02)'">
+                <input type="radio" formControlName="role" value="seller" class="d-none">
+                <span class="fs-2 me-3">💼</span>
+                <div>
+                  <strong class="text-white font-sm uppercase tracking-wider mb-1 d-block">Seller</strong>
+                  <span class="text-muted font-xs d-block" style="font-size:0.68rem; line-height:1.2;">List assets & run auctions</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- OAuth Column -->
+          <div class="text-center mt-3 mt-md-0">
+            <p class="text-muted-light small mb-3 tracking-wider font-xs">OAUTH REGISTRATION</p>
+            
+            <button type="button" class="btn btn-google-premium rounded-pill d-flex align-items-center justify-content-center w-100 py-3 shadow transition-all" (click)="onGoogleSignUp()">
+              <img src="Google-Icon.png" alt="Google" class="me-2" style="width: 22px; height: 22px;">
+              <span class="fw-semibold text-white small">Google Signup</span>
+            </button>
+
+            <p class="text-muted font-xs mt-3 leading-sm px-2 mb-0">
+              Your profile role selection is bound to your OAuth registration permanently.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </form>
+  </div>
+</div>

@@ -1,0 +1,149 @@
+<div class="welcome-container">
+
+  <!-- 🌌 Background Glowing Blobs -->
+  <div class="glow-orb glow-orb--cyan"></div>
+  <div class="glow-orb glow-orb--purple"></div>
+  <div class="glow-orb glow-orb--gold"></div>
+
+  <!-- 🚀 Hero Section -->
+  <header class="hero-section text-center">
+        
+    <h1 class="hero-title animate-fade-in">
+      The Next-Gen<br>
+      <span class="gradient-text">Real-Time Bidding</span> Arena
+    </h1>
+
+    <p class="hero-subtitle text-white-50 mx-auto animate-fade-in-delayed">
+      Experience milliseconds-latency global auctions, private seller inventory command centers, and bulletproof escrow anti-shill protections.
+    </p>
+
+    <!-- Dynamic Hero Action Buttons based on User State -->
+    <div class="hero-actions d-flex justify-content-center gap-3 mt-5 animate-fade-in-delayed">
+      <ng-container *ngIf="!(authService.user$ | async)">
+        <a routerLink="/login" class="btn-arena btn-arena--gold">
+          ⚡ Enter Bidding Arena
+        </a>
+        <a routerLink="/seller/login" class="btn-arena btn-arena--cyan">
+          💼 Launch Seller Portal
+        </a>
+      </ng-container>
+
+      <ng-container *ngIf="authService.user$ | async">
+        <a routerLink="/dashboard" class="btn-arena btn-arena--gold" [class.btn-arena--cyan]="authService.getCurrentRole() === 'seller'">
+          <span>💻 Open {{ authService.getCurrentRole() === 'bidder' ? 'Bidding Arena' : 'Seller Command Center' }}</span>
+        </a>
+        <a routerLink="/profile" class="btn-arena btn-arena--ghost">
+          👤 View Profile
+        </a>
+      </ng-container>
+    </div>
+  </header>
+
+  <!-- 📊 Features Section -->
+  <section class="features-section container mt-5 pt-4">
+    <div class="section-header text-center mb-5">
+      <h2 class="section-title text-gold font-accent">Designed for Transparency</h2>
+      <p class="section-sub text-muted small uppercase tracking-wider">Millisecond updates. Uncompromising security.</p>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- Feature 1: Real-Time Bids -->
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-card__icon bg-cyan-glow text-cyan">⚡</div>
+          <h3 class="feature-card__title">Millisecond WebSockets</h3>
+          <p class="feature-card__text">
+            Compete globally with live bid updates broadcasted instantly. Receive outbid warnings and place bids at millisecond speed.
+          </p>
+          <div class="feature-card__glow feature-card__glow--cyan"></div>
+        </div>
+      </div>
+
+      <!-- Feature 2: Seller Command -->
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-card__icon bg-purple-glow text-purple">💼</div>
+          <h3 class="feature-card__title">Seller Command Center</h3>
+          <p class="feature-card__text">
+            Add assets privately to your offline product inventory first. Tweak descriptions, set defaults, and list them live with a single click.
+          </p>
+          <div class="feature-card__glow feature-card__glow--purple"></div>
+        </div>
+      </div>
+
+      <!-- Feature 3: Escrow Protection -->
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-card__icon bg-gold-glow text-warning">🔒</div>
+          <h3 class="feature-card__title">Escrow Shill Protection</h3>
+          <p class="feature-card__text">
+            Built-in self-bidding restrictions detect and block sellers from bidding on their own live items, keeping the marketplace secure.
+          </p>
+          <div class="feature-card__glow feature-card__glow--gold"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 📈 Live Demo Stat Console -->
+  <section class="stat-section container text-center mt-5 pt-5 pb-5">
+    <div class="glass-console p-5 rounded border border-secondary shadow-lg">
+      <div class="row align-items-center">
+        <div class="col-lg-6 text-start px-4">
+          <span class="badge bg-danger rounded-pill px-3 py-1 mb-3 uppercase tracking-wider text-white">Platform Activity</span>
+          <h3 class="text-white fw-bold mb-3 display-6">Escrow Verified Auction House</h3>
+          <p class="text-white-50 small leading-relaxed mb-4">
+            Omni Market utilizes smart Supabase schemas and PostgreSQL triggers to ensure complete transaction security. Join thousands of high-value traders today.
+          </p>
+          <div class="d-flex align-items-center gap-4">
+            <div>
+              <span class="d-block h3 text-gold fw-bold mb-0">100%</span>
+              <span class="text-muted-light small">Fair Bidding Guarantee</span>
+            </div>
+            <div class="border-end border-secondary h-100" style="width: 1px; height: 40px !important;"></div>
+            <div>
+              <span class="d-block h3 text-success fw-bold mb-0">₹0</span>
+              <span class="text-muted-light small">Hidden Escrow Fees</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Illustrative Block -->
+        <div class="col-lg-6 mt-4 mt-lg-0 px-4">
+          <div class="illustrative-bid-box p-4 rounded text-start border border-secondary shadow">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="small text-muted font-monospace">ACTIVE AUCTION FEED</span>
+              <span class="badge bg-success rounded-pill px-3 py-1 font-xs">⚡ SYNCED</span>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 p-3 rounded mb-2 bg-dark-lighter border border-secondary">
+              <span class="display-6">🏷️</span>
+              <div>
+                <strong class="text-white d-block small">Rolex Submariner 2022</strong>
+                <span class="text-success fw-bold">₹9,45,000</span>
+              </div>
+              <span class="badge bg-gold text-dark ms-auto py-2">Active</span>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 p-3 rounded bg-dark-lighter border border-secondary opacity-75">
+              <span class="display-6">🏷️</span>
+              <div>
+                <strong class="text-white d-block small">Vintage Leica M6 camera</strong>
+                <span class="text-success fw-bold">₹2,80,000</span>
+              </div>
+              <span class="badge bg-secondary ms-auto py-2">5m left</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🏁 Footer Arena -->
+  <footer class="footer-arena container text-center border-top border-secondary pt-5 pb-5 mt-5">
+    <p class="text-muted small">© 2026 Omni Market Arena Inc. All rights reserved. Escrow transactions powered by Supabase Secure Escrow.</p>
+  </footer>
+
+</div>

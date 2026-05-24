@@ -1,0 +1,6 @@
+@OmniMarket.Gateway_HostAddress = http://localhost:5276
+
+GET {{OmniMarket.Gateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,33 @@
+.env
+
+# IDE Settings (IMPORTANT: Do not push these)
+.idea/
+.vs/
+*.iml
+*.csproj.user
+
+# .NET Build Folders
+**/bin/
+**/obj/
+
+# Java / Spring Boot Build Folders
+**/target/
+**/.mvn/
+
+# Angular / Node Modules
+**/node_modules/
+**/dist/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Scratch and log directories
+scratch/
+logs/
+*.log
+
+# Recursive environment configurations
+**/.env
+**/.env.local
+**/logs/
